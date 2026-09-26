@@ -30,22 +30,32 @@ jobs:
         run: |
           # TODO: apague os três containers, se existirem.
           # Dica: o passo não pode falhar quando eles ainda não existem.
-          echo "TODO"
+           ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker rm banco api front || true"
+
 
       - name: Criar rede e volume
         run: |
           # TODO: as duas redes e o volume. A rede do banco é interna.
           # Dica: criar o que já existe devolve erro. Trate isso.
-          echo "TODO"
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker network create dados --interna || true"
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker network create web || true"
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker volume create pgdata || true"
+
 
       - name: Subir banco, API e front
         run: |
           # TODO: os três containers, na ordem certa.
           # O front precisa receber o commit que o deploy publicou:
           #   -e DEPLOY_SHA=${{ github.sha }}
-          echo "TODO"
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker run postgres:17-alpine --name banco -e POSTGRES_PASSWORD=${{ secrets.DB_SENHA }} -e POSTGRES_DB=pokedex --network dados -v pgdata:/var/lib/postgresql/data"
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker run gr-atv2-api:1 --name api -e POSTGRES_HOST=gr-farias-silva-banco -e POSTGRES_DB=pokedex -e POSTGRES_PASSWORD=${{ secrets.DB_SENHA }} --network web"
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker network connect dados api"
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker run gr-atv2-front:1 --name front -p 23060:80 -e API=gr-farias-silva-api -e DEPLOY_SHA=${{ github.sha }} --network web"
+
 
       - name: Conferir que subiu
+        run: |
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker ps"
         run: |
           # TODO: pergunte ao servidor se a listagem responde.
           echo "TODO"
