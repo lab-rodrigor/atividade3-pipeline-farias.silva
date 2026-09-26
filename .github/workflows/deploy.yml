@@ -9,9 +9,9 @@ on:
 
 env:
   # TODO: troque pelo seu slug, o começo do seu e-mail com ponto virando hífen.
-  SLUG: SEU-SLUG
+  SLUG: farias-silva
   # TODO: a primeira porta da sua faixa. Veja em `gr-docker ajuda`.
-  PORTA: 230N0
+  PORTA: 23060
 
 jobs:
   deploy:
@@ -56,6 +56,3 @@ jobs:
       - name: Conferir que subiu
         run: |
           ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker ps"
-        run: |
-          # TODO: pergunte ao servidor se a listagem responde.
-          echo "TODO"
