@@ -37,11 +37,9 @@ jobs:
         run: |
           # TODO: as duas redes e o volume. A rede do banco é interna.
           # Dica: criar o que já existe devolve erro. Trate isso.
-          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker network create dados [--interna] || true"
-          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker network create web || true"
-          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker volume create pgdata || true"
-
-
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker network ls --meus"
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker volume ls"
+          
       - name: Subir banco, API e front
         run: |
           # TODO: os três containers, na ordem certa.
