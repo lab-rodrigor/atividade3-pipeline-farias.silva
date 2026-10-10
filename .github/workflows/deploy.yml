@@ -30,13 +30,18 @@ jobs:
         run: |
           # TODO: apague os três containers, se existirem.
           # Dica: o passo não pode falhar quando eles ainda não existem.
-           ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker rm api || true"
            ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker rm front || true"
+           ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker rm api || true"
+           ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker rm banco || true"
 
       - name: Criar rede e volume
         run: |
           # TODO: as duas redes e o volume. A rede do banco é interna.
           # Dica: criar o que já existe devolve erro. Trate isso.
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker network create dados --interna || true"
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker network create web || true"
+          ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker volume create pgdata || true"
+
           ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker network ls --meus"
           ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker volume ls"
           
@@ -49,7 +54,6 @@ jobs:
           ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker run gr-atv2-api:1 --name api -e POSTGRES_HOST=gr-farias-silva-banco -e POSTGRES_DB=pokedex -e POSTGRES_PASSWORD=${{ secrets.DB_SENHA }} --network web"
           ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker network connect dados api"
           ssh -i ~/.ssh/deploy gr-farias-silva@gr.lab.ayty.org "gr-docker run gr-atv2-front:1 --name front -p 23060:80 -e API=gr-farias-silva-api -e DEPLOY_SHA=${{ github.sha }} --network web"
-
 
       - name: Conferir que subiu
         run: |
